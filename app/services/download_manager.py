@@ -321,12 +321,12 @@ def fetch_channel_images(youtube_channel_id: str) -> dict:
             avatar_url = m.group(1)
 
         # Banner: search for banner thumbnails in page data
-        for marker in ('"banner":{"thumbnails"', '"imageBannerViewModel"'):
+        for marker in ('"banner":{"thumbnails"', '"banner":{"imageBannerViewModel"'):
             pos = html.find(marker)
             if pos >= 0:
                 segment = html[pos : pos + 3000]
                 urls = re.findall(
-                    r'"(https://yt3\.googleusercontent\.com/[^"]+)"', segment
+                    r'"(https://yt3\.(?:ggpht|googleusercontent)\.com/[^"]+)"', segment
                 )
                 if urls:
                     # Last URL is typically the highest resolution
