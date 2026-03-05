@@ -1,6 +1,5 @@
 """Tests for channel_poller metadata refresh logic."""
 
-from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 
 from app.models.channel import Channel
