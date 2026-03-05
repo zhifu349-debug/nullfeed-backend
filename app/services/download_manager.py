@@ -339,13 +339,16 @@ def fetch_channel_images(youtube_channel_id: str) -> dict:
             pos = html.find(marker)
             if pos >= 0:
                 segment = html[pos : pos + 3000]
-                urls = re.findall(
-                    r'"(https://yt3\.(?:ggpht|googleusercontent)\.com/[^"]+)"', segment
-                )
-                if urls:
-                    # Last URL is typically the highest resolution
-                    banner_url = urls[-1].replace("\\u0026", "&")
-                break
+                m_list = re.search(r"\[(.*?)\]", segment)
+                if m_list:
+                    urls = re.findall(
+                        r'"(https://yt3\.(?:ggpht|googleusercontent)\.com/[^"]+)"',
+                        m_list.group(1),
+                    )
+                    if urls:
+                        # Last URL is typically the highest resolution
+                        banner_url = urls[-1].replace("\\u0026", "&")
+                    break
 
         logger.info(
             "Channel images for %s: avatar=%s, banner=%s",
