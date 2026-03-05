@@ -76,7 +76,8 @@ async def generate_recommendations(
             messages=[{"role": "user", "content": prompt}],
         )
 
-        response_text = message.content[0].text
+        block = message.content[0]
+        response_text = block.text if hasattr(block, "text") else ""
         suggestions = json.loads(response_text)
     except Exception:
         logger.exception("Failed to get recommendations from Anthropic")

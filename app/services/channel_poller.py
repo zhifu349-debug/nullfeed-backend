@@ -32,8 +32,8 @@ def poll_all_channels(db: Session) -> list[str]:
     all_auto_download_ids: list[str] = []
     for channel_id in channel_ids:
         try:
-            result = poll_single_channel(channel_id, db)
-            all_auto_download_ids.extend(result["auto_download_ids"])
+            poll_result = poll_single_channel(channel_id, db)
+            all_auto_download_ids.extend(poll_result["auto_download_ids"])
         except Exception:
             logger.exception("Error polling channel %s", channel_id)
 

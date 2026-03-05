@@ -79,7 +79,7 @@ def download_video(
     last_line = ""
 
     try:
-        for line in process.stdout:
+        for line in process.stdout or []:
             last_line = line
             m = progress_re.search(line)
             if m and progress_callback is not None:
