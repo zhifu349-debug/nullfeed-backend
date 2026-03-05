@@ -164,7 +164,32 @@ async def refresh_channel_images(
     await db.commit()
     await db.refresh(channel)
 
+    sub_count_result = await db.execute(
+        select(func.count())
+        .select_from(UserSubscription)
+        .where(UserSubscription.channel_id == channel_id)
+    )
+    subscriber_count = sub_count_result.scalar() or 0
+
+    video_count_result = await db.execute(
+        select(func.count()).select_from(Video).where(Video.channel_id == channel_id)
+    )
+    video_count = video_count_result.scalar() or 0
+
+    sub_result = await db.execute(
+        select(UserSubscription).where(
+            UserSubscription.user_id == user.id,
+            UserSubscription.channel_id == channel_id,
+        )
+    )
+    sub = sub_result.scalar_one_or_none()
+
     detail = ChannelDetail.model_validate(channel)
+    detail.subscriber_count = subscriber_count
+    detail.video_count = video_count
+    detail.is_subscribed = sub is not None
+    if sub:
+        detail.tracking_mode = sub.tracking_mode
     return detail
 
 
