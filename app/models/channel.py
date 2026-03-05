@@ -18,6 +18,7 @@ class Channel(Base):
     banner_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     avatar_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     last_checked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    metadata_refreshed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     videos = relationship("Video", back_populates="channel", lazy="selectin")
     subscriptions = relationship("UserSubscription", back_populates="channel", lazy="selectin")

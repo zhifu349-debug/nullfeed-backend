@@ -10,7 +10,7 @@ from app.tasks.celery_app import celery_app
 from app.models.channel import Channel
 from app.models.subscription import UserSubscription
 from app.models.video import Video
-from app.services.channel_poller import poll_all_channels, poll_single_channel
+from app.services.channel_poller import poll_all_channels, poll_single_channel, refresh_stale_channel_metadata
 from app.services.download_manager import download_preview, download_video
 from app.services.progress_broadcaster import (
     publish_download_complete,
@@ -76,6 +76,24 @@ def poll_channel_task(self, channel_id: str) -> dict:
         }
     except Exception:
         logger.exception("Error polling channel %s", channel_id)
+        return {"status": "error"}
+    finally:
+        db.close()
+
+
+@celery_app.task(
+    name="app.tasks.download_tasks.refresh_stale_channel_metadata_task",
+    bind=True,
+    max_retries=0,
+)
+def refresh_stale_channel_metadata_task(self) -> dict:
+    """Periodic task: refresh channel metadata (name, avatar, banner) for stale channels."""
+    db = _get_sync_db()
+    try:
+        updated = refresh_stale_channel_metadata(db)
+        return {"status": "ok", "updated": updated}
+    except Exception:
+        logger.exception("Error in refresh_stale_channel_metadata_task")
         return {"status": "error"}
     finally:
         db.close()
