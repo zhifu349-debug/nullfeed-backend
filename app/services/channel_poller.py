@@ -134,7 +134,7 @@ def refresh_stale_channel_metadata(db: Session) -> int:
         .join(UserSubscription, UserSubscription.channel_id == Channel.id)
         .where(
             (Channel.metadata_refreshed_at.is_(None))
-            | (Channel.metadata_refreshed_at < staleness_threshold)
+            | (Channel.metadata_refreshed_at <= staleness_threshold)
             | (Channel.avatar_url.is_(None))
             | (Channel.banner_url.is_(None))
         )
@@ -150,6 +150,7 @@ def refresh_stale_channel_metadata(db: Session) -> int:
             updated += 1
         except Exception:
             logger.exception("Error refreshing metadata for channel %s", channel.id)
+            db.rollback()
 
     return updated
 
