@@ -144,6 +144,30 @@ async def subscribe(
     return out
 
 
+@router.post("/{channel_id}/refresh-images", response_model=ChannelDetail)
+async def refresh_channel_images(
+    channel_id: str,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> ChannelDetail:
+    """Fetch fresh avatar and banner images from YouTube and update the channel."""
+    result = await db.execute(select(Channel).where(Channel.id == channel_id))
+    channel = result.scalar_one_or_none()
+    if not channel:
+        raise HTTPException(status_code=404, detail="Channel not found")
+
+    images = await _resolve_channel_images(channel.youtube_channel_id)
+    if images.get("avatar_url"):
+        channel.avatar_url = images["avatar_url"]
+    if images.get("banner_url"):
+        channel.banner_url = images["banner_url"]
+    await db.commit()
+    await db.refresh(channel)
+
+    detail = ChannelDetail.model_validate(channel)
+    return detail
+
+
 @router.delete("/{channel_id}/unsubscribe")
 async def unsubscribe(
     channel_id: str,
