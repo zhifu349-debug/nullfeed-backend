@@ -13,6 +13,7 @@ NullFeed is a self-hosted YouTube media center that wraps **yt-dlp** with a poli
 
 ## Features
 
+- **Instant Playback with Progressive Quality** -- Start watching immediately, even while a video is still downloading. The backend serves a low-quality stream on demand, then seamlessly upgrades to the full-quality version once the download completes -- no buffering, no interruption.
 - **Automated Channel Subscriptions** -- Subscribe to YouTube channels and automatically download new uploads on a configurable polling interval.
 - **Download Manager** -- Celery-based task queue with configurable concurrency, retry logic, and exponential backoff.
 - **Media Streaming** -- Built-in static file server with HTTP range request support for native seeking and scrubbing.
